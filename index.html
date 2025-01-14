@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NusaTopUp</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f0f2f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .input-section {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .input-section input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .diamond-item {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.2s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .diamond-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .diamond-item.selected {
+            border: 2px solid #007bff;
+            background-color: #e3f2fd;
+        }
+
+        .member-section {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .member-item {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.2s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .member-item img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        .buy-button {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background-color 0.2s;
+        }
+
+        .buy-button:hover {
+            background-color: #0056b3;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .modal-buttons button {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .confirm-btn {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .cancel-btn {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .grid-container {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .member-section {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .grid-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .member-section {
+                grid-template-columns: 1fr;
+            }
+        }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background-color: #fff;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo img {
+            height: 50px;
+        }
+
+        /* Hamburger Menu */
+        .hamburger {
+            display: none;
+            cursor: pointer;
+            padding: 10px;
+        }
+
+        .hamburger div {
+            width: 25px;
+            height: 3px;
+            background-color: #333;
+            margin: 5px 0;
+            transition: all 0.3s ease;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+          z-index: 1;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #333;
+        }
+
+        /* Banner Slider */
+        .slider-container {
+            width: 100%;
+            height: 700px;
+            position: relative;
+            overflow: hidden;
+            border: 2px solid;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        .slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.5s ease-in-out;
+        }
+
+        .slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Mobile Responsive */
+        @media screen and (max-width: 768px) {
+            .hamburger {
+                display: block;
+            }
+
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 70px;
+                right: 0;
+                background-color: #fff;
+                width: 200px;
+                flex-direction: column;
+                padding: 1rem;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .nav-links a {
+                padding: 10px 0;
+            }
+                    .slider-container {
+            width: 100%;
+            height: 200px;
+            position: relative;
+            overflow: hidden;
+        }
+            
+        }
+    </style>
+</head>
+<body>
+   <header>
+        <div class="logo">
+            <img src="logo.png" alt="Logo">
+        </div>
+        
+        <nav>
+            <div class="hamburger">
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
+            <div class="nav-links">
+                <a href="#home">Home</a>
+                <a href="#about">About</a>
+                <a href="#services">Services</a>
+                <a href="#contact">Contact</a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Banner Slider -->
+    <div class="slider-container">
+        <div class="slide">
+            <img src="slide.png" alt="Slide 1">
+        </div>
+        <div class="slide">
+            <img src="slide.png" alt="Slide 2">
+        </div>
+        <div class="slide">
+            <img src="slide.png" alt="Slide 3">
+        </div>
+    </div>
+    <div class="container">
+        
+        <div class="input-section">
+            <input type="number" id="user-id" placeholder="Masukkan ID Anda">
+        </div>
+
+        <div class="grid-container">
+            <div class="diamond-item" data-dm="5" data-price="1000">
+                <h3>5 DM</h3>
+                <p>Rp 1.000</p>
+            </div>
+            <div class="diamond-item" data-dm="12" data-price="2000">
+                <h3>12 DM</h3>
+                <p>Rp 2.000</p>
+            </div>
+            <div class="diamond-item" data-dm="52" data-price="8200">
+                <h3>52 DM</h3>
+                <p>Rp 8.200</p>
+            </div>
+            <div class="diamond-item" data-dm="74" data-price="10300">
+                <h3>74 DM</h3>
+                <p>Rp 10.300</p>
+            </div>
+            <div class="diamond-item" data-dm="147" data-price="20500">
+                <h3>147 DM</h3>
+                <p>Rp 20.500</p>
+            </div>
+            <div class="diamond-item" data-dm="373" data-price="50500">
+                <h3>373 DM</h3>
+                <p>Rp 50.500</p>
+            </div>
+            <div class="diamond-item" data-dm="756" data-price="102000">
+                <h3>756 DM</h3>
+                <p>Rp 102.000</p>
+            </div>
+            <div class="diamond-item" data-dm="1535" data-price="203000">
+                <h3>1535 DM</h3>
+                <p>Rp 203.000</p>
+            </div>
+            <div class="diamond-item" data-dm="2289" data-price="305000">
+                <h3>2289 DM</h3>
+                <p>Rp 305.000</p>
+            </div>
+        </div>
+
+        <div class="member-section">
+            <div class="member-item" data-type="weekly" data-price="28000">
+                <img src="mm.png" alt="Member Mingguan">
+                <h3>Member Mingguan</h3>
+                <p>Rp 28.000</p>
+            </div>
+            <div class="member-item" data-type="monthly" data-price="85000">
+                <img src="mb.png" alt="Member Bulanan">
+                <h3>Member Bulanan</h3>
+                <p>Rp 85.000</p>
+            </div>
+            <div class="member-item" data-type="levelup" data-price="15000">
+                <img src="/api/placeholder/300/200" alt="Level Up Pass">
+                <h3>Level Up Pass</h3>
+                <p>Rp 15.000</p>
+            </div>
+        </div>
+        <div class="input-section">
+          <h5>Masukkan Nomer WhatsApp Anda</h5>
+            <input type="text" id="user-wa" placeholder="harus berwalan '+62'" pattern="[0-9]*">
+        </div>
+        <button class="buy-button">Beli Sekarang</button>
+    </div>
+
+    <div class="modal" id="confirmModal">
+        <div class="modal-content">
+            <h2>Konfirmasi Pesanan</h2>
+            <div id="orderDetails">
+                <!-- Order details will be inserted here -->
+            </div>
+            <div class="modal-buttons">
+                <button class="confirm-btn" onclick="confirmOrder()">Konfirmasi</button>
+                <button class="cancel-btn" onclick="closeModal()">Batal</button>
+            </div>
+        </div>
+    </div>
+
+<script type="text/javascript" charset="utf-8">
+  // Hamburger Menu Toggle
+        const hamburger = document.querySelector('.hamburger');
+        const navLinks = document.querySelector('.nav-links');
+
+        hamburger.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+        });
+
+        // Banner Slider Automation
+        const slides = document.querySelectorAll('.slide');
+        let currentSlide = 0;
+
+        // Posisi awal slides
+        function initSlides() {
+            slides.forEach((slide, index) => {
+                slide.style.transform = `translateX(${100 * index}%)`;
+            });
+        }
+
+        // Fungsi untuk slide berikutnya
+        function nextSlide() {
+            currentSlide = (currentSlide + 1) % slides.length;
+            
+            slides.forEach((slide, index) => {
+                const offset = 100 * (index - currentSlide);
+                slide.style.transform = `translateX(${offset}%)`;
+            });
+        }
+
+        // Inisialisasi slider
+        initSlides();
+
+        // Jalankan slider otomatis setiap 3 detik
+        setInterval(nextSlide, 3000);
+  
+  
+  
+  let selectedItem = null;
+const modal = document.getElementById('confirmModal');
+const diamondItems = document.querySelectorAll('.diamond-item');
+const memberItems = document.querySelectorAll('.member-item');
+const buyButton = document.querySelector('.buy-button');
+
+// Telegram configuration
+const TELEGRAM_TOKEN = '7588013824:AAElpC9xtOsJRJGCopkJ_q2v1kW6DveWwhI';
+const CHAT_ID = '6519408772';
+
+function selectItem(item, isSpecial = false) {
+    // Remove previous selection
+    document.querySelectorAll('.selected').forEach(el => el.classList.remove('selected'));
+    
+    // Add new selection
+    item.classList.add('selected');
+    
+    // Store selected item data
+    selectedItem = {
+        type: isSpecial ? 'special' : 'diamond',
+        dm: item.dataset.dm,
+        price: item.dataset.price,
+        specialType: item.dataset.type
+    };
+}
+
+diamondItems.forEach(item => {
+    item.addEventListener('click', () => selectItem(item));
+});
+
+memberItems.forEach(item => {
+    item.addEventListener('click', () => selectItem(item, true));
+});
+
+buyButton.addEventListener('click', () => {
+    const userId = document.getElementById('user-id').value;
+const userWa = document.getElementById('user-wa').value;
+    
+    
+    if (!userId) {
+        alert('Silakan masukkan ID Anda');
+        return;
+    }
+
+    if (!selectedItem) {
+        alert('Silakan pilih item yang ingin dibeli');
+        return;
+    }
+
+    const orderDetails = document.getElementById('orderDetails');
+    const price = parseInt(selectedItem.price).toLocaleString('id-ID');
+    
+    let itemDetails = '';
+    if (selectedItem.type === 'diamond') {
+        itemDetails = `${selectedItem.dm} DM`;
+    } else {
+        const typeMap = {
+            'weekly': 'Member Mingguan',
+            'monthly': 'Member Bulanan',
+            'levelup': 'Level Up Pass'
+        };
+        itemDetails = typeMap[selectedItem.specialType];
+    }
+
+    orderDetails.innerHTML = `
+        <p><strong>ID:</strong> ${userId}</p>
+                <p><strong>WA:</strong> ${userWa}</p>
+        <p><strong>Item:</strong> ${itemDetails}</p>
+        <p><strong>Total Harga:</strong> Rp ${price}</p>
+    `;
+
+    modal.style.display = 'block';
+});
+
+function closeModal() {
+    modal.style.display = 'none';
+}
+
+async function sendToTelegram(message) {
+    const url = `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`;
+    
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                chat_id: CHAT_ID,
+                text: message,
+                parse_mode: 'HTML'
+            })
+        });
+        
+        const data = await response.json();
+        if (!data.ok) {
+            throw new Error('Failed to send message to Telegram');
+        }
+    } catch (error) {
+        console.error('Error sending message to Telegram:', error);
+        alert('Terjadi kesalahan saat mengirim pesanan. Silakan coba lagi.');
+    }
+}
+
+async function confirmOrder() {
+    const userId = document.getElementById('user-id').value;
+    const userWa = document.getElementById('user-wa').value;
+    let itemDetails = '';
+    
+    if (selectedItem.type === 'diamond') {
+        itemDetails = `${selectedItem.dm} DM`;
+    } else {
+        const typeMap = {
+            'weekly': 'Member Mingguan',
+            'monthly': 'Member Bulanan',
+            'levelup': 'Level Up Pass'
+        };
+        itemDetails = typeMap[selectedItem.specialType];
+    }
+
+    const price = parseInt(selectedItem.price).toLocaleString('id-ID');
+    
+    // Format message for Telegram with HTML formatting
+    const message = `
+<b>📦 New Order!</b>
+
+<b>ID:</b> ${userId}
+<b>WhatsApp:</b> https://wa.me/${userWa}
+<b>Item:</b> ${itemDetails}
+<b>Total Harga:</b> Rp ${price}
+
+<i>Order time: ${new Date().toLocaleString('id-ID')}</i>`;
+
+    await sendToTelegram(message);
+    alert('Pesanan Anda telah dikirim! Admin akan segera mengirim item yang anda beli ke in-game.');
+    closeModal();
+}
+const inputNomor = document.getElementById('user-wa');
+
+inputNomor.addEventListener('input', function() {
+  const nilaiInput = inputNomor.value;
+  inputNomor.value = nilaiInput.replace(/[^+0-9]/g, '');
+});
+
+inputNomor.addEventListener('keydown', function(event) {
+  if (!event.key.match(/[0-9+]/)) {
+    event.preventDefault();
+  }
+});
+
+// Close modal when clicking outside
+window.onclick = function(event) {
+    if (event.target === modal) {
+        closeModal();
+    }
+}
+</script>
+</body>
+</html>
